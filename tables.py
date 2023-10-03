@@ -1,5 +1,6 @@
 import requests
 import functions as fun
+import pandas as pd
 
 # lista para armazenar os nomes das APIs que não foram carregadas com sucesso
 api_erro = []
@@ -25,4 +26,10 @@ else:
     data_bancos = requests.get("https://brasilapi.com.br/api/banks/v1").json()
     data_cidade = requests.get("https://brasilapi.com.br/api/cptec/v1/cidade").json()
     data_estados = requests.get("https://brasilapi.com.br/api/ibge/uf/v1").json()
+
+# colocando dados em um dataframe
+corretoras = pd.DataFrame(data_corretoras)
+bancos = pd.DataFrame(data_bancos)
+cidade = pd.DataFrame(data_cidade)
+estados = pd.DataFrame(data_estados)
 

@@ -32,4 +32,3 @@ corretoras = pd.DataFrame(data_corretoras)
 bancos = pd.DataFrame(data_bancos)
 cidade = pd.DataFrame(data_cidade)
 estados = pd.DataFrame(data_estados)
-

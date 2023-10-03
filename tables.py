@@ -10,7 +10,6 @@ resp_corretoras = "https://brasilapi.com.br/api/cvm/corretoras/v1"
 resp_bancos = "https://brasilapi.com.br/api/banks/v1"
 resp_cidade = "https://brasilapi.com.br/api/cptec/v1/cidade"
 resp_estados = "https://brasilapi.com.br/api/ibge/uf/v1"
-resp_pix = "https://brasilapi.com.br/api/pix/v1/participants"
 
 # verificação de apis usando a função verificar_api
 fun.verificar_api(resp_corretoras, "Corretoras", api_erro)

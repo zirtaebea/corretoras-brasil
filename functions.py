@@ -173,6 +173,8 @@ def remove_caractere_especial(data, col):
     data[col] = data[col].str.replace('Ú', 'U')
     data[col] = data[col].str.replace('Ù', 'U')
 
+
+
 # ! ----------------- FUNÇÃO PARA VISUALIZAR TABELAS DO DB 
 def tabelas_bd():
     # fazendo conexão

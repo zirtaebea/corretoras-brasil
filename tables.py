@@ -139,6 +139,8 @@ corretoras_tratado.reset_index(drop=True, inplace=True)
 # transformar para int
 fun.transforma_int(corretoras_tratado, 'cnpj')
 
+# dropando duplicatas
+corretoras_tratado = corretoras_tratado.drop_duplicates(subset='cnpj', keep='last')
 
 # COLUNA 'codigo_cvm': 
 # transformar para int

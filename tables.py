@@ -262,6 +262,19 @@ municipios_tratado = municipios_tradado[nova_ordem_municipio]
 
 
 
+# * ----------------- UNSTACKED DE STATUS DE CORRETORAS POR ESTADO
+# agrupando tabela por uf e status e fazendo um count agrupamento dos tipos de status existentes 
+corretoras_grouped = corretoras_tratado.groupby(['uf', 'status'])['status'].count()
+
+# unstack do status para poder aparecer os tipos de status diferentes como colunas
+corretoras_unstacked = corretoras_grouped.unstack(level=1)
+
+# preenchendo os vazios com 0
+corretoras_unstacked = corretoras_unstacked.fillna(0)
+
+
+
+
 # * ----------------- SALVANDO BASES TRATADAS .CSV
 # corretoras
 corretoras_tratado.to_csv('01_csv_files/dados_tratados/corretoras_tratado.csv')

@@ -252,25 +252,23 @@ fun.texto_em_maiusculo(municipios, 'nome')
 fun.remove_caractere_especial(municipios, 'nome')
 
 # renomeando a coluna 'nome' para 'municipio'
-municipios_tradado = municipios.rename(columns={'nome': 'municipio'})
+municipios_tratado = municipios.rename(columns={'nome': 'municipio'})
 
 # TODAS AS COLUNAS:
 # reordenando colunas
 nova_ordem_municipio = ['codigo_ibge', 'municipio', 'uf']
-municipios_tratado = municipios_tradado[nova_ordem_municipio]
+municipios_tratado = municipios_tratado[nova_ordem_municipio]
 
 
 
 
-# * ----------------- UNSTACKED DE STATUS DE CORRETORAS POR ESTADO
+# * ----------------- STACK E UNSTACK
 # agrupando tabela por uf e status e fazendo um count agrupamento dos tipos de status existentes 
-corretoras_grouped = corretoras_tratado.groupby(['uf', 'status'])['status'].count()
+corretoras_status_uf = fun.unstacked_count_agg(corretoras_tratado, 'uf', 'status', 'count')
 
-# unstack do status para poder aparecer os tipos de status diferentes como colunas
-corretoras_unstacked = corretoras_grouped.unstack(level=1)
-
-# preenchendo os vazios com 0
-corretoras_unstacked = corretoras_unstacked.fillna(0)
+# corretoras por estado
+colunas = ['nome_social', 'cnpj']
+corretoras_por_estado = fun.stacked_tabela(corretoras_tratado, 'uf', colunas)
 
 
 

@@ -213,3 +213,27 @@ def carrega_bd(nome_tabela):
     conn.close()
     # retornando resultado obtido da consulta
     return consulta
+
+
+
+# ! ----------------- FUNÇÃO PARA REALIZAR UMA FUNÇÃO DE AGREGAÇÃO DE UMA COLUNA POR OUTRA
+def unstacked_count_agg(df, index, coluna, agg):
+    # agrupando o df e adicionando uma função de agregação
+    grouped = df.groupby([f'{index}', f'{coluna}'])[f'{coluna}'].agg(agg)
+    # unstack na segunda coluna
+    unstacked = grouped.unstack(level=1)
+    # preenchendo os vazios com zero
+    unstacked = unstacked.fillna(0)
+    # retornando resultado para ser armazenado em uma variável
+    return unstacked
+
+
+
+# ! ----------------- FUNÇÃO PARA REALIZAR EMPILHAMENTO DE DADOS DE DETEMINADAS COLUNAS
+def stacked_tabela(df, index, colunas):
+    # df com as colunas a serem empilhadas
+    stacked_df = df.set_index([index])[colunas].stack().reset_index()
+    # renomeando colunas
+    stacked_df.columns = [index, 'colunas_empilhadas', 'valores']
+    # retornando resultado para ser armazenado em uma variável
+    return stacked_df

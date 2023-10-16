@@ -126,7 +126,7 @@ Lembrando que o processo de verificação do tratamento desses dados é contínu
 
 #### Funções de tratamento de dados
 
-O tratamento de dados foi otimizado com algumas funções.
+O tratamento de dados foi otimizado com algumas funções. (INSERIR DADOS)
 
 ### Consulta de tabelas
 

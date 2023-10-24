@@ -11,14 +11,12 @@ import pandas as pd
 api_erro = []
 
 
-
 # ! 2) URL DAS APIS
 # corretoras
 resp_corretoras = "https://brasilapi.com.br/api/cvm/corretoras/v1"
 
 # estados
 resp_estados = "https://brasilapi.com.br/api/ibge/uf/v1"
-
 
 
 # ! 3) RETORNANDO DADOS DAS APIS
@@ -29,46 +27,45 @@ dados_municipios = []
 
 # a api de municípios é necessita de uma chave para ser chamada (a sigla da unidade federativa)
 # lista de siglas das unidades federativas para inserir na url da api e gerar dados dos municipios
-siglas_uf = ['RO', 'AC', 'AM', 'RR', 'PA', 'AP', 'TO', 'MA', 'PI', 
-    'CE', 'RN', 'PB', 'PE', 'AL', 'SE', 'BA', 'MG', 
-    'ES', 'RJ', 'SP', 'PR', 'SC', 'RS', 'MS', 'MT', 'GO', 'DF']
+siglas_uf = ['RO', 'AC', 'AM', 'RR', 'PA', 'AP', 'TO', 'MA', 'PI',
+             'CE', 'RN', 'PB', 'PE', 'AL', 'SE', 'BA', 'MG',
+             'ES', 'RJ', 'SP', 'PR', 'SC', 'RS', 'MS', 'MT', 'GO', 'DF']
 
 # iterador de siglas para poder acessar os dados de município de cada uf
 # para cada uf na lista siglas_uf
 for uf in siglas_uf:
-        # foi feita uma função cujo objetivo é retornar os dados da api
-        # armazenando os dados da função (que recebe a uf dentro da lista de siglas_uf)
-        muni_uf = fun.retorna_municipios(uf)
-        # para cada cidade presente na lista muni_uf
-        for cidade in muni_uf:
-            # criando coluna uf para adicionar a lista de dados da api
-            cidade['uf'] = uf
-            # fazendo um append de todos os municipios de cada uf na lista dados_municipio
-            dados_municipios.append(muni_uf)
+    # foi feita uma função cujo objetivo é retornar os dados da api
+    # armazenando os dados da função (que recebe a uf dentro da lista de siglas_uf)
+    muni_uf = fun.retorna_municipios(uf)
+    # para cada cidade presente na lista muni_uf
+    for cidade in muni_uf:
+        # criando coluna uf para adicionar a lista de dados da api
+        cidade['uf'] = uf
+        # fazendo um append de todos os municipios de cada uf na lista dados_municipio
+        dados_municipios.append(muni_uf)
 
 # tratando lista dados municipios para tirar dados aninhados
 data_municipios = fun.trata_municipio(dados_municipios)
 
 
 # 3.2) verificação de apis de corretoras e estados usando a função verificar_api
-#corretoras
+# corretoras
 fun.verificar_api(resp_corretoras, "Corretoras", api_erro)
 
-#estados
+# estados
 fun.verificar_api(resp_estados, "Estados", api_erro)
 
 # se uma das apis (corretoras ou estado) estiver indisponível:
-if api_erro: 
+if api_erro:
     fun.api_indisponivel(api_erro)
-# se não, armazene os dados nessas variáveis:    
+# se não, armazene os dados nessas variáveis:
 else:
     data_corretoras = requests.get(resp_corretoras).json()
     data_estados = requests.get(resp_estados).json()
 
 
-
 #  ! 4) COLOCANDO DADOS DAS APIS EM DATAFRAMES
-#corretoras
+# corretoras
 corretoras = pd.DataFrame(data_corretoras)
 
 # estados
@@ -76,8 +73,6 @@ estados = pd.DataFrame(data_estados)
 
 # municipios
 municipios = pd.DataFrame(data_municipios)
-
-
 
 
 # * ----------------- SALVANDO BASES BRUTAS .CSV
@@ -91,30 +86,27 @@ estados.to_csv('01_csv_files/dados_brutos/estados_bruto.csv')
 municipios.to_csv('01_csv_files/dados_brutos/municipios_bruto.csv')
 
 
-
-
 # * ----------------- TRATAMENTO DE DADOS
 # ! 1) VERIFICAÇÃO DE DADOS
-# verificando as tabelas 
+# verificando as tabelas
 
 # CORRETORAS
-# print(corretoras.info()) 
+# print(corretoras.info())
 
-# ESTADOS 
-# print(estados.info()) 
+# ESTADOS
+# print(estados.info())
 
 # MUNICIPIOS
-# print(municipios.info()) 
-
+# print(municipios.info())
 
 
 # ! 2) TRATANDO DADOS DF CORRETORAS
 # transformando dados de data de string para datetime
 fun.string_data(corretoras)
 
-# COLUNA 'telefone': 
+# COLUNA 'telefone':
 # eliminando linhas que não possuem números de telefone
-fun.string_vazia(corretoras, 'telefone') # * 41 campos em branco
+fun.string_vazia(corretoras, 'telefone')  # * 41 campos em branco
 
 # transformando coluna para tipo int
 fun.transforma_int(corretoras, 'telefone')
@@ -131,39 +123,44 @@ corretoras_tratado = fun.adiciona_3_telefone(corretoras_tratado, 'telefone')
 
 # COLUNA 'email', 'complemento', 'bairro', 'type', 'pais', 'cep':
 # dropando colunas com muitos missing values não essenciais para a análise
-corretoras_tratado = corretoras_tratado.drop(['email', 'complemento', 'bairro', 'type', 'pais', 'cep'], axis=1)
+corretoras_tratado = corretoras_tratado.drop(
+    ['email', 'complemento', 'bairro', 'type', 'pais', 'cep'], axis=1)
 corretoras_tratado.reset_index(drop=True, inplace=True)
 
 
-# COLUNA 'cnpj': 
+# COLUNA 'cnpj':
 # transformar para int
 fun.transforma_int(corretoras_tratado, 'cnpj')
 
 # dropando duplicatas
-corretoras_tratado = corretoras_tratado.drop_duplicates(subset='cnpj', keep='last')
+corretoras_tratado = corretoras_tratado.drop_duplicates(
+    subset='cnpj', keep='last')
 
-# COLUNA 'codigo_cvm': 
+# COLUNA 'codigo_cvm':
 # transformar para int
 fun.transforma_int(corretoras_tratado, 'codigo_cvm')
 
 
 # COLUNA 'valor_patrimonio_liquido', 'logradouro', 'municipio', 'nome_comercial':
-# remover valores vazios pontuais nas demais colunas que possuem valores vazios 
-fun.string_vazia(corretoras_tratado, 'valor_patrimonio_liquido') #* 3 em branco
-fun.string_vazia(corretoras_tratado, 'logradouro') #* 1 em branco
-fun.string_vazia(corretoras_tratado, 'municipio') #* 1 em branco -- se apagar o registro em branco do logradouro, apaga esse registro tb
-fun.string_vazia(corretoras_tratado, 'nome_comercial') #* 14 valores em branco
+# remover valores vazios pontuais nas demais colunas que possuem valores vazios
+fun.string_vazia(corretoras_tratado,
+                 'valor_patrimonio_liquido')  # * 3 em branco
+fun.string_vazia(corretoras_tratado, 'logradouro')  # * 1 em branco
+# * 1 em branco -- se apagar o registro em branco do logradouro, apaga esse registro tb
+fun.string_vazia(corretoras_tratado, 'municipio')
+# * 14 valores em branco
+fun.string_vazia(corretoras_tratado, 'nome_comercial')
 
-# valor_patrimonio_liquido 
-corretoras_tratado = corretoras_tratado[corretoras_tratado['valor_patrimonio_liquido']!= '']
+# valor_patrimonio_liquido
+corretoras_tratado = corretoras_tratado[corretoras_tratado['valor_patrimonio_liquido'] != '']
 
 # logradouro
-corretoras_tratado = corretoras_tratado[corretoras_tratado['logradouro']!= '']
+corretoras_tratado = corretoras_tratado[corretoras_tratado['logradouro'] != '']
 
-#nome_comercial
-corretoras_tratado = corretoras_tratado[corretoras_tratado['nome_comercial']!= '']
-corretoras_tratado = corretoras_tratado[corretoras_tratado['nome_comercial']!= '--']
-corretoras_tratado = corretoras_tratado[corretoras_tratado['nome_comercial']!= '-----']
+# nome_comercial
+corretoras_tratado = corretoras_tratado[corretoras_tratado['nome_comercial'] != '']
+corretoras_tratado = corretoras_tratado[corretoras_tratado['nome_comercial'] != '--']
+corretoras_tratado = corretoras_tratado[corretoras_tratado['nome_comercial'] != '-----']
 
 
 # COLUNA 'valor_patrimonio_liquido':
@@ -185,13 +182,14 @@ fun.remove_caractere_especial(corretoras_tratado, 'municipio')
 
 # TODAS AS COLUNAS
 # ordenando colunas
-nova_ordem_colunas = ['codigo_cvm','cnpj', 'nome_social', 'nome_comercial', 'status', 'telefone', 'uf', 'municipio', 'logradouro', 'data_patrimonio_liquido', 'valor_patrimonio_liquido', 'data_inicio_situacao', 'data_registro']
+nova_ordem_colunas = ['codigo_cvm', 'cnpj', 'nome_social',
+                      'nome_comercial', 'status', 'telefone', 'uf', 'municipio', 'logradouro',
+                      'data_patrimonio_liquido', 'valor_patrimonio_liquido', 'data_inicio_situacao', 'data_registro']
 corretoras_tratado = corretoras_tratado[nova_ordem_colunas]
 
 
 # resetando index
 corretoras_tratado.reset_index(drop=True, inplace=True)
-
 
 
 # ! 3) TRATANDO DADOS DF ESTADOS
@@ -214,7 +212,7 @@ sigla_regiao = [estados['regiao']['sigla'] for estados in data_estados]
 
 # adicionando dados tratados em um novo dataframe
 estados_tratado = pd.DataFrame({
-    "uf": sigla, 
+    "uf": sigla,
     "id": id,
     "nome": nome,
     "regiao": regiao,
@@ -233,7 +231,6 @@ fun.remove_caractere_especial(estados_tratado, 'nome')
 # COLUNA 'id':
 # transformando para int
 fun.transforma_int(estados_tratado, 'id')
-
 
 
 # ! 4) TRATANDO DADOS DF MUNICIPIOS
@@ -260,30 +257,35 @@ nova_ordem_municipio = ['codigo_ibge', 'municipio', 'uf']
 municipios_tratado = municipios_tratado[nova_ordem_municipio]
 
 
-
-
-# * ----------------- STACK E UNSTACK
-# agrupando tabela por uf e status e fazendo um count agrupamento dos tipos de status existentes 
-corretoras_status_uf = fun.unstacked_count_agg(corretoras_tratado, 'uf', 'status', 'count')
+# * ----------------- STACK E UNSTACK (exemplos)
+# agrupando tabela por uf e status e fazendo um count agrupamento dos tipos de status existentes
+# corretoras_status_uf = fun.unstacked_count_agg(corretoras_tratado, 'uf', 'status', 'count')
 
 # corretoras por estado
-colunas = ['nome_social', 'cnpj']
-corretoras_por_estado = fun.stacked_tabela(corretoras_tratado, 'uf', colunas)
-
-
+# colunas = ['nome_social', 'cnpj']
+# corretoras_por_estado = fun.stacked_tabela(corretoras_tratado, 'uf', colunas)
 
 
 # * ----------------- SALVANDO BASES TRATADAS .CSV
 # corretoras
 corretoras_tratado.to_csv('01_csv_files/dados_tratados/corretoras_tratado.csv')
+# se o csv for criado com sucesso, alerta:
+fun.alerta_etapa_concluida(
+    '01_csv_files/dados_tratados/corretoras_tratado.csv', 'Corretoras', 'tratada e salva em .csv')
+
 
 # estados
 estados_tratado.to_csv('01_csv_files/dados_tratados/estados_tratado.csv')
+# se o csv for criado com sucesso, alerta:
+fun.alerta_etapa_concluida(
+    '01_csv_files/dados_tratados/estados_tratado.csv', 'Estados', 'tratada e salva em .csv')
+
 
 # municipios
 municipios_tratado.to_csv('01_csv_files/dados_tratados/municipios_tratado.csv')
-
-
+# se o csv for criado com sucesso, alerta:
+fun.alerta_etapa_concluida(
+    '01_csv_files/dados_tratados/municipios_tratado.csv', 'Municípios', 'tratada e salva em .csv')
 
 
 # * ----------------- ARMAZENANDO DADOS EM UM DB
@@ -295,6 +297,7 @@ fun.salva_bd(estados_tratado, 'estados')
 
 # municipios
 fun.salva_bd(municipios_tratado, 'municipios')
+
 
 # consultando
 fun.tabelas_bd()

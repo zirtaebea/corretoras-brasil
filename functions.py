@@ -6,29 +6,26 @@ from plyer import notification
 import sqlite3
 
 
-
 # ! ----------------- FUNÇÃO PARA VERIFICAR APIS
 def verificar_api(url, nome_api, lista):
     resp = requests.get(url)
     # se a resposta for diferente de 200 (indisponivel)
-    if resp.status_code !=200: 
+    if resp.status_code != 200:
         # colocar nome da api na lista de apis indisponíveis
         lista.append(nome_api)
-
 
 
 # ! ----------------- FUNÇÃO NOTIFY API INDISPONÍVEL
 def api_indisponivel(lista):
     # se a lista de apis indisponíveis for true, ou seja, se tiver algum item
-    if lista: 
-        # notify de erro 
+    if lista:
+        # notify de erro
         message = f'Não foi possível acessar as seguintes APIs: {", ".join(lista)}'
     notification.notify(
         title='APIs Indisponíveis',
         message=message,
         timeout=15
     )
-
 
 
 # ! ----------------- FUNÇÃO PARA RETORNAR MUNICIPIOS DA API DO IBGE
@@ -47,31 +44,29 @@ def retorna_municipios(siglaUF):
         print(f"Falha na solicitação da API para {siglaUF}.")
 
 
-
 # ! ----------------- FUNÇÃO PARA TRATAR DADOS DA API MUNICIPIOS IBGE
 def trata_municipio(muni):
     # lista para salvar os dados tratados dos municipios
     lista_municipios = []
     # para cada municipio por uf presente na lista de municipios brutos aninhados
     for lista_municipios_uf in muni:
-        # para cada municipio puro presente na lista de municipio por uf 
+        # para cada municipio puro presente na lista de municipio por uf
         for municipio in lista_municipios_uf:
             # atribuindo colunas
             nome = municipio['nome']
             codigo_ibge = municipio['codigo_ibge']
             uf = municipio['uf']
             # adicionando dados tratados a lista de municipios
-            lista_municipios.append({'uf': uf,'nome': nome, 'codigo_ibge': codigo_ibge})
+            lista_municipios.append(
+                {'uf': uf, 'nome': nome, 'codigo_ibge': codigo_ibge})
     # retornando os dados tratados para serem armazenados na variavel do .py principal
     return lista_municipios
-
 
 
 # ! ----------------- FUNÇÃO STRING EM MAIÚSCULO
 def texto_em_maiusculo(data, col):
     # colocando caracteres em maiusculo
     data[col] = data[col].str.upper()
-
 
 
 # ! -----------------  FUNÇÃO TRANSFORMAR STRING EM DATETIME
@@ -84,15 +79,13 @@ def string_data(data):
             data[column] = pd.to_datetime(data[column])
 
 
-
 # ! ----------------- FUNÇÃO PARA VERIFICAR SE EXISTEM CAMPOS VAZIOS (QUE NÃO PEGAM .isna())
 def string_vazia(data, coluna):
-    # filtrando colunas com '' 
+    # filtrando colunas com ''
     resultado = (data[coluna] == '').sum()
     # printando resultado
     vazio = f"A coluna {coluna} do Dataframe possui {resultado} campos em branco"
     return vazio
-
 
 
 # ! ----------------- FUNÇÃO TRANSFORMAR STRING '' EM INT
@@ -105,7 +98,6 @@ def transforma_int(data, coluna):
     data.info()
 
 
-
 # ! ----------------- FUNÇÃO PARA ELIMINAR VALORES 0 DO TIPO INT
 def elimina_vazios_int(data, coluna):
     # filtrando apenas por valores diferentes de zero
@@ -114,7 +106,6 @@ def elimina_vazios_int(data, coluna):
     data.reset_index(drop=True, inplace=True)
     # retornando valor para armazenar na variavel .py principal
     return data
-
 
 
 # ! ----------------- FUNÇÃO PARA ELIMINAR VALORES DE TELEFONE COM MENOS DE 7 DIGITOS
@@ -131,18 +122,16 @@ def elimina_tel(data, coluna):
     return data
 
 
-
 # ! -----------------  FUNÇÃO PARA ADICIONAR NÚMERO 3 EM TELEFONES COM 7 DIGITOS
 def adiciona_3_telefone(data, coluna):
     # filtro transformando a coluna em string e selecionando apenas os telefones com 7 digitos
     filtro = data[coluna].astype(str).str.len() == 7
     # adicionando '3' apenas aos registros filtrados
     data.loc[filtro, coluna] = '3' + data.loc[filtro, coluna].astype(str)
-    # convertendo a coluna de volta para inteiros 
+    # convertendo a coluna de volta para inteiros
     data[coluna] = data[coluna].astype(int)
     # retornando valor para armazenar na variavel .py principal
     return data
-
 
 
 # ! -----------------  FUNÇÃO PARA TRANSFORMAR EM FLOAT
@@ -153,8 +142,7 @@ def transforma_float(data, coluna):
     data[coluna] = data[coluna].round(2)
 
 
-
-# ! ----------------- FUNÇÃO PARA REMOVER CARACTERES ESPECIAIS 
+# ! ----------------- FUNÇÃO PARA REMOVER CARACTERES ESPECIAIS
 def remove_caractere_especial(data, col):
     # substituido carecteres especiais na string
     data[col] = data[col].str.replace('Ç', 'C')
@@ -174,8 +162,7 @@ def remove_caractere_especial(data, col):
     data[col] = data[col].str.replace('Ù', 'U')
 
 
-
-# ! ----------------- FUNÇÃO PARA VISUALIZAR TABELAS DO DB 
+# ! ----------------- FUNÇÃO PARA VISUALIZAR TABELAS DO DB
 def tabelas_bd():
     # fazendo conexão
     conn = sqlite3.connect('00_db/corretoras-brasil.db')
@@ -189,7 +176,6 @@ def tabelas_bd():
     conn.close()
 
 
-
 # ! ----------------- FUNÇÃO PARA SALVAR TABELA NO DB
 def salva_bd(df, nome_tabela):
     # fazendo conexão
@@ -198,7 +184,6 @@ def salva_bd(df, nome_tabela):
     df.to_sql(nome_tabela, conn, if_exists='replace', index=False)
     # fechando conexão
     conn.close()
-
 
 
 # ! ----------------- FUNÇÃO PARA VISUALIZAR UMA TABELA EM ESPECIFICO NO DB
@@ -215,7 +200,6 @@ def carrega_bd(nome_tabela):
     return consulta
 
 
-
 # ! ----------------- FUNÇÃO PARA REALIZAR UMA FUNÇÃO DE AGREGAÇÃO DE UMA COLUNA POR OUTRA
 def unstacked_count_agg(df, index, coluna, agg):
     # agrupando o df e adicionando uma função de agregação
@@ -228,7 +212,6 @@ def unstacked_count_agg(df, index, coluna, agg):
     return unstacked
 
 
-
 # ! ----------------- FUNÇÃO PARA REALIZAR EMPILHAMENTO DE DADOS DE DETEMINADAS COLUNAS
 def stacked_tabela(df, index, colunas):
     # df com as colunas a serem empilhadas
@@ -237,3 +220,14 @@ def stacked_tabela(df, index, colunas):
     stacked_df.columns = [index, 'colunas_empilhadas', 'valores']
     # retornando resultado para ser armazenado em uma variável
     return stacked_df
+
+
+# ! ----------------- FUNÇÃO PARA REALIZAR EMPILHAMENTO DE DADOS DE DETEMINADAS COLUNAS
+def alerta_etapa_concluida(base, nome, etapa):
+    if base:
+        # notify de erro
+        message = f'A base {nome} foi {etapa} com sucesso'
+        notification.notify(
+            title='Concluído',
+            message=message,
+            timeout=15)

@@ -5,6 +5,7 @@ import pandas as pd
 from plyer import notification
 import sqlite3
 
+# """"""
 
 # ! ----------------- FUNÇÃO PARA VERIFICAR APIS
 def verificar_api(url, nome_api, lista):

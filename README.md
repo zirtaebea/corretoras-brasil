@@ -145,9 +145,4 @@ municipios.head()
 
 Lembrando que o processo de verificação do tratamento desses dados é contínuo durante toda a execução a fim de manter os dados com maior qualidade possível.
 
-### Consulta de tabelas
-
-Para consultar as tabelas criadas você pode utilizar a seguinte função **tabelas_bd()**.
-
-Para consultar uma tabela em específico você pode utilizar a seguinte função **carrega_bd()**.
 
